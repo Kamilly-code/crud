@@ -3,19 +3,30 @@ package com.api.crud.services;
 import com.api.crud.manejar_errores.TaskFoundException;
 import com.api.crud.models.TaskModel;
 import com.api.crud.repositories.TaskRepository;
+import com.api.crud.request.TaskRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 
 @Service
 public class TaskService {
 
-    @Autowired
-    private TaskRepository taskRepository;
 
-    public TaskModel insertTask(TaskModel task){
+    private final TaskRepository taskRepository;
+
+    @Autowired
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
+
+    public TaskModel insertTask(TaskRequestDTO taskRequestDTO){
+        TaskModel task = new TaskModel();
+        task.setTarea(taskRequestDTO.getTarea());
+        task.setIsCompleted(taskRequestDTO.getCompleted() != null && taskRequestDTO.getCompleted());
+        task.setRemoteId(UUID.randomUUID().toString());
         return taskRepository.save(task);
     }
 
@@ -26,8 +37,8 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public ArrayList<TaskModel> getAllTasks() {
-        return (ArrayList<TaskModel>) taskRepository.findAll();
+    public List<TaskModel> getAllTasks() {
+        return taskRepository.findAll();
     }
 
     public void deleteTask(long id) {

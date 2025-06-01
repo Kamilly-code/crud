@@ -6,16 +6,21 @@ import com.api.crud.repositories.PomodoroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PomodoroService {
 
-    @Autowired
-    private PomodoroRepository pomodoroRepository;
 
-    public ArrayList<PomodoroModel> getPomodoros(){
-        return (ArrayList<PomodoroModel>)pomodoroRepository.findAll();
+    private final PomodoroRepository pomodoroRepository;
+
+    @Autowired
+    public PomodoroService(PomodoroRepository pomodoroRepository) {
+        this.pomodoroRepository = pomodoroRepository;
+    }
+
+    public List<PomodoroModel> getPomodoros(){
+        return pomodoroRepository.findAll();
     }
 
     public PomodoroModel insertPomodoro(PomodoroModel pomodoro){

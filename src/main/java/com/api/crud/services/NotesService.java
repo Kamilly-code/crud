@@ -1,23 +1,29 @@
 package com.api.crud.services;
 
 import com.api.crud.manejar_errores.NoteNotFoundException;
-import com.api.crud.Request.NoteRequestDTO;
+import com.api.crud.request.NoteRequestDTO;
 import com.api.crud.models.NotesModel;
 import com.api.crud.repositories.NotesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class NotesService {
 
-    @Autowired
-    private NotesRepository notesRepository;
 
-    public ArrayList<NotesModel> getAllNotes() {
-        return (ArrayList<NotesModel>) notesRepository.findAll();
+    private final NotesRepository notesRepository;
+
+    @Autowired
+    public NotesService(NotesRepository notesRepository) {
+        this.notesRepository = notesRepository;
+    }
+
+    public List<NotesModel> getAllNotes() {
+        return notesRepository.findAll();
     }
 
     public  NotesModel insertNote(NoteRequestDTO noteDto){

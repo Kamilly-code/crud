@@ -1,23 +1,28 @@
 package com.api.crud.controllers;
 
-import com.api.crud.Request.NoteRequestDTO;
+import com.api.crud.request.NoteRequestDTO;
 import com.api.crud.models.NotesModel;
 import com.api.crud.services.NotesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/notes")
 public class NotesController {
 
+    private final NotesService notesService;
+
     @Autowired
-    private NotesService notesService;
+    public NotesController(NotesService notesService) {
+        this.notesService = notesService;
+    }
+
 
     @GetMapping
-    public ResponseEntity<ArrayList<NotesModel>> getAllNotes() {
+    public ResponseEntity<List<NotesModel>> getAllNotes() {
         return ResponseEntity.ok(notesService.getAllNotes());
     }
 

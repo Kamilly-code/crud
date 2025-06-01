@@ -1,8 +1,8 @@
 package com.api.crud.controllers;
 
 
-import com.api.crud.Request.UserRequestDTO;
-import com.api.crud.Request.response.UserResponseDTO;
+import com.api.crud.request.UserRequestDTO;
+import com.api.crud.request.response.UserResponseDTO;
 import com.api.crud.models.UserModel;
 import com.api.crud.services.UserService;
 import jakarta.validation.Valid;
@@ -11,14 +11,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
+
+    private final UserService userService;
+
     @Autowired
-    private UserService userService;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
 
     @GetMapping
     public ResponseEntity<ArrayList<UserModel>> getUsers() {

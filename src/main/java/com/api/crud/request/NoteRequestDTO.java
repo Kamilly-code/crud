@@ -1,4 +1,4 @@
-package com.api.crud.Request;
+package com.api.crud.request;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -12,6 +12,9 @@ public class TaskModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false, updatable = false)
+    private String remoteId;
+
     @NotBlank(message = "La tarea es obligatoria")
     private String tarea;
 
@@ -42,4 +45,16 @@ public class TaskModel {
         this.isCompleted = isCompleted;
     }
 
+    public String getRemoteId() {
+        return remoteId;
+    }
+
+    public void setRemoteId(String remoteId) {
+        this.remoteId = remoteId;
+    }
+
+
+    public void setCompleted(Boolean completed) {
+        isCompleted = completed;
+    }
 }
