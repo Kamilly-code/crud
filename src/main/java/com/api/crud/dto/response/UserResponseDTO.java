@@ -1,4 +1,4 @@
-package com.api.crud.request.response;
+package com.api.crud.dto.response;
 
 public class UserResponseDTO  {
     private Long id;

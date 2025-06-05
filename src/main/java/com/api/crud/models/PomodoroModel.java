@@ -1,5 +1,6 @@
 package com.api.crud.models;
 
+import com.api.crud.PomodoroState;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -28,6 +29,26 @@ public class PomodoroModel {
     @Min(value = 1,message = "Debe haber al menos una ronda")
     private Integer rounds;
 
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int totalMinutes;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "current_state")
+    private PomodoroState currentState;
+
+    private String lastUpdatedDate;
+
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int currentRound;
+
+
+    public int getCurrentRound() {
+        return currentRound;
+    }
+
+    public void setCurrentRound(int currentRound) {
+        this.currentRound = currentRound;
+    }
 
     public Long getId() {
         return id;
@@ -67,5 +88,29 @@ public class PomodoroModel {
 
     public void setRounds(Integer rounds) {
         this.rounds = rounds;
+    }
+
+    public int getTotalMinutes() {
+        return totalMinutes;
+    }
+
+    public void setTotalMinutes(int totalMinutes) {
+        this.totalMinutes = totalMinutes;
+    }
+
+    public PomodoroState getCurrentState() {
+        return currentState;
+    }
+
+    public void setCurrentState(PomodoroState currentState) {
+        this.currentState = currentState;
+    }
+
+    public String getLastUpdatedDate() {
+        return lastUpdatedDate;
+    }
+
+    public void setLastUpdatedDate(String lastUpdatedDate) {
+        this.lastUpdatedDate = lastUpdatedDate;
     }
 }

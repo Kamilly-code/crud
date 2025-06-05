@@ -1,7 +1,7 @@
 package com.api.crud.controllers;
 
 import com.api.crud.models.TaskModel;
-import com.api.crud.request.TaskRequestDTO;
+import com.api.crud.dto.request.TaskRequestDTO;
 import com.api.crud.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

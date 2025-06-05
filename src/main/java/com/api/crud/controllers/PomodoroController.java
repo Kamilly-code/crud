@@ -1,44 +1,55 @@
 package com.api.crud.controllers;
 
-import com.api.crud.models.PomodoroModel;
+import com.api.crud.dto.request.PomodoroRequestDTO;
+import com.api.crud.dto.response.PomodoroResponseDTO;
 import com.api.crud.services.PomodoroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/pomodoros")
 public class PomodoroController {
 
+
+    private final PomodoroService pomodoroService;
+
     @Autowired
-    private PomodoroService pomodoroService;
+    public PomodoroController(PomodoroService pomodoroService) {
+        this.pomodoroService = pomodoroService;
+    }
 
     @GetMapping
-    public ResponseEntity<PomodoroModel> getPomodorosSettings(){
-        PomodoroModel pomodoro = pomodoroService.getPomodoroSettings();
-        if (pomodoro != null) {
-            return ResponseEntity.ok(pomodoro);
-        }else {
+    public ResponseEntity<PomodoroResponseDTO> getPomodorosSettings(){
+        PomodoroResponseDTO dto = pomodoroService.getPomodoroSettings();
+        if (dto != null) {
+            return ResponseEntity.ok(dto);
+        } else {
             return ResponseEntity.noContent().build();
         }
     }
 
     @PostMapping
-    public ResponseEntity<PomodoroModel> insertPomodoro(@RequestBody PomodoroModel pomodoro) {
-        return ResponseEntity.ok(pomodoroService.insertPomodoro(pomodoro));
+    public ResponseEntity<PomodoroResponseDTO> insertPomodoro(@RequestBody PomodoroRequestDTO dto) {
+        return ResponseEntity.ok(pomodoroService.insertPomodoro(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PomodoroModel> updatePomodoro(@PathVariable Long id, @RequestBody PomodoroModel pomodoro){
-        return ResponseEntity.ok(pomodoroService.updatePomodoro(id,pomodoro));
+    public ResponseEntity<PomodoroResponseDTO> updatePomodoro(@PathVariable Long id,
+                                                              @RequestBody PomodoroRequestDTO dto) {
+        return ResponseEntity.ok(pomodoroService.updatePomodoro(id, dto));
     }
 
     @DeleteMapping
     public ResponseEntity<String> deleteAllPomodoroSettings() {
         pomodoroService.deleteAll();
         return ResponseEntity.ok("Todas las configuraciones del pomodoro fueron borradas con suceso!");
+    }
+
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
     }
 
 }

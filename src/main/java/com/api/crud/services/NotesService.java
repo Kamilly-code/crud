@@ -1,7 +1,7 @@
 package com.api.crud.services;
 
 import com.api.crud.manejar_errores.NoteNotFoundException;
-import com.api.crud.request.NoteRequestDTO;
+import com.api.crud.dto.request.NoteRequestDTO;
 import com.api.crud.models.NotesModel;
 import com.api.crud.repositories.NotesRepository;
 import org.springframework.beans.factory.annotation.Autowired;

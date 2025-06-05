@@ -1,6 +1,6 @@
 package com.api.crud.controllers;
 
-import com.api.crud.request.NoteRequestDTO;
+import com.api.crud.dto.request.NoteRequestDTO;
 import com.api.crud.models.NotesModel;
 import com.api.crud.services.NotesService;
 import org.springframework.beans.factory.annotation.Autowired;

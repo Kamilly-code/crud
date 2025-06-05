@@ -1,8 +1,8 @@
 package com.api.crud.controllers;
 
 
-import com.api.crud.request.UserRequestDTO;
-import com.api.crud.request.response.UserResponseDTO;
+import com.api.crud.dto.request.UserRequestDTO;
+import com.api.crud.dto.response.UserResponseDTO;
 import com.api.crud.models.UserModel;
 import com.api.crud.services.UserService;
 import jakarta.validation.Valid;

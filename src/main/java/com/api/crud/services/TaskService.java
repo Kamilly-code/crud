@@ -3,7 +3,7 @@ package com.api.crud.services;
 import com.api.crud.manejar_errores.TaskFoundException;
 import com.api.crud.models.TaskModel;
 import com.api.crud.repositories.TaskRepository;
-import com.api.crud.request.TaskRequestDTO;
+import com.api.crud.dto.request.TaskRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
