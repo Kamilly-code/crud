@@ -1,28 +1,26 @@
-# Etapa 1: Build da aplicação usando Maven
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+# Etapa de construção
+FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
+COPY . .
 
-# Otimização: Cache das dependências Maven
-RUN mvn dependency:go-offline
+# Cache de dependências (otimização)
+RUN mvn dependency:go-offline -B
 
+# Build do projeto
 RUN mvn clean package -DskipTests
 
-# Etapa 2: Imagem final leve
+# Etapa final
 FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
 
-# Configurações críticas de memória e performance
-ENV JAVA_OPTS="-Xms128m -Xmx256m -XX:+UseSerialGC -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Djava.security.egd=file:/dev/./urandom"
+# Copia o JAR identificando pelo padrão do nome
+COPY --from=builder /app/target/*.jar app.jar
+
+# Configurações essenciais
+ENV JAVA_OPTS="-Xms128m -Xmx256m -XX:+UseSerialGC -Djava.security.egd=file:/dev/./urandom"
 ENV TZ=Europe/Madrid
-
-# Health check (importante para o Railway)
-HEALTHCHECK --interval=30s --timeout=3s \
-  CMD wget -q -O /dev/null http://localhost:4000/health || exit 1
 
 EXPOSE 4000
 
