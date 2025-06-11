@@ -3,7 +3,7 @@ services:
     image: postgres:15
     environment:
       POSTGRES_USER: clouddy
-      POSTGRES_PASSWORD: Pedrinho123
+      POSTGRES_PASSWORD: m1vNW1mgCWTl5Z1874j1aHoFOnfSYwLK
       POSTGRES_DB: clouddydatabase
     ports:
       - "5432:5432"
@@ -11,9 +11,9 @@ services:
   app:
     build: .
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/clouddydatabase
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dpg-d14k7te3jp1c73bgpokg-a.render.com:5432/clouddydatabase
       SPRING_DATASOURCE_USERNAME: clouddy
-      SPRING_DATASOURCE_PASSWORD: Pedrinho123
+      SPRING_DATASOURCE_PASSWORD: m1vNW1mgCWTl5Z1874j1aHoFOnfSYwLK
     ports:
       - "4000:4000"
     depends_on:
