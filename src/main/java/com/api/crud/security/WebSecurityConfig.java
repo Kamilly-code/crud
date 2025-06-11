@@ -33,6 +33,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/public/**").permitAll()
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users/sync").permitAll()
                         .anyRequest().authenticated()
                 )
