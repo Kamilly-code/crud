@@ -1,7 +1,5 @@
 package com.api.crud.dto.request;
 
-
-
 public class PomodoroRequestDTO {
     private int focusTime;
     private int shortBreakTime;
@@ -11,6 +9,24 @@ public class PomodoroRequestDTO {
     private String currentState;
     private String lastUpdatedDate;
     private int currentRound;
+    private String remoteId;
+    private String userId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getRemoteId() {
+        return remoteId;
+    }
+
+    public void setRemoteId(String remoteId) {
+        this.remoteId = remoteId;
+    }
 
     public int getCurrentRound() {
         return currentRound;

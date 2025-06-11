@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "tareas")
 public class TaskModel {
@@ -20,6 +22,30 @@ public class TaskModel {
 
     @NotNull(message = "El estado de la tarea es obligatorio")
     private Boolean isCompleted;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private UserModel user;
+
+
+    @Column(nullable = false)
+    private LocalDate date;
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public UserModel getUser() {
+        return user;
+    }
+
+    public void setUser(UserModel user) {
+        this.user = user;
+    }
 
     public Long getId() {
         return id;

@@ -1,28 +1,38 @@
 package com.api.crud.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.Pattern;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
 public class UserModel {
+
    @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+   private String id;
+
 
     private String nombreUser;
+
     private String email;
-    private String password;
+
     private String genero;
 
-    public Long getId() {
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NotesModel> notes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PomodoroModel> pomodoros = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TaskModel> tasks = new ArrayList<>();
+
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -42,19 +52,35 @@ public class UserModel {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getGenero() {
         return genero;
     }
 
     public void setGenero(String genero) {
         this.genero = genero;
+    }
+
+    public List<NotesModel> getNotes() {
+        return notes;
+    }
+
+    public void setNotes(List<NotesModel> notes) {
+        this.notes = notes;
+    }
+
+    public List<PomodoroModel> getPomodoros() {
+        return pomodoros;
+    }
+
+    public void setPomodoros(List<PomodoroModel> pomodoros) {
+        this.pomodoros = pomodoros;
+    }
+
+    public List<TaskModel> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<TaskModel> tasks) {
+        this.tasks = tasks;
     }
 }

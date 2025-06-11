@@ -3,18 +3,16 @@ package com.api.crud.services;
 import com.api.crud.manejar_errores.NoteNotFoundException;
 import com.api.crud.dto.request.NoteRequestDTO;
 import com.api.crud.models.NotesModel;
+import com.api.crud.models.UserModel;
 import com.api.crud.repositories.NotesRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class NotesService {
-
-
     private final NotesRepository notesRepository;
 
     @Autowired
@@ -26,35 +24,64 @@ public class NotesService {
         return notesRepository.findAll();
     }
 
-    public  NotesModel insertNote(NoteRequestDTO noteDto){
-        NotesModel note = new NotesModel();
-        note.setTitle(noteDto.getTitle());
-        note.setNote(noteDto.getNote());
-        note.setRemoteId(UUID.randomUUID().toString());
+    public List<NotesModel> findByUserId(String userId) {
+        return notesRepository.findByUserId(userId);
+    }
 
+    public  NotesModel insertNote(NoteRequestDTO dto ,UserModel user){
+        NotesModel note = new NotesModel();
+        note.setTitle(dto.getTitle());
+        note.setNote(dto.getNote());
+        note.setRemoteId(dto.getRemoteId() != null && !dto.getRemoteId().isEmpty()
+                ? dto.getRemoteId()
+                : UUID.randomUUID().toString());
+
+        // Converta a String para LocalDate
+        if (dto.getDate() == null) {
+            throw new IllegalArgumentException("A data da nota não pode ser nula");
+        }
+        note.setDate(dto.getDate());
+        note.setUser(user);
         return notesRepository.save(note);
     }
 
-    public NotesModel updateNote(Long id, NoteRequestDTO dto) {
-        NotesModel existingNote = notesRepository.findById(id)
-                .orElseThrow(() -> new NoteNotFoundException("Nota com ID " + id + " não encontrada"));
+    @Transactional
+    public NotesModel updateNote(Long id, NoteRequestDTO dto, String userId) {
+        NotesModel existingNote = notesRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new NoteNotFoundException(id));
 
-        existingNote.setTitle(dto.getTitle());
-        existingNote.setNote(dto.getNote());
-
+        if(dto.getTitle() != null) {
+            existingNote.setTitle(dto.getTitle());
+        }
+        if(dto.getNote() != null) {
+            existingNote.setNote(dto.getNote());
+        }
+        if(dto.getDate() != null) {
+            existingNote.setDate(dto.getDate());
+        }
 
         return notesRepository.save(existingNote);
     }
 
-    public void deleteNoteById (Long id) {
-        if (!notesRepository.existsById(id)){
+    public void deleteNoteById(Long id, String userId) {
+        if (!notesRepository.existsByIdAndUserId(id, userId)) {
             throw new NoteNotFoundException(id);
         }
         notesRepository.deleteById(id);
     }
 
+
     public void deleteAllNotes() {
         notesRepository.deleteAll();
+    }
+
+
+    public void deleteAllNotesByUserId(String userId) {
+        List<NotesModel> userNotes = notesRepository.findByUserId(userId);
+        if (userNotes.isEmpty()) {
+            throw new NoteNotFoundException("Nenhuma nota encontrada para o usuário com ID: " + userId);
+        }
+        notesRepository.deleteAll(userNotes);
     }
 
 }

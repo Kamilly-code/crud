@@ -1,23 +1,23 @@
 package com.api.crud.dto.response;
 
 public class UserResponseDTO  {
-    private Long id;
+    private String id;
     private String nombreUser;
     private String email;
     private String genero;
 
-    public UserResponseDTO(Long id, String nombreUser, String email, String genero) {
+    public UserResponseDTO(String id, String nombreUser, String email, String genero) {
         this.id = id;
         this.nombreUser = nombreUser;
         this.email = email;
         this.genero = genero;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

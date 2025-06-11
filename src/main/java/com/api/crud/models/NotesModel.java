@@ -9,36 +9,35 @@ import java.time.LocalDate;
 @Table(name = "notes")
 public class NotesModel {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @Column(unique = true, nullable = false, updatable = false)
     private String remoteId;
 
+
     private String title;
+
 
     @NotBlank(message = "La nota no puede estar vacía")
     private String note;
 
+    @Column(nullable = false)
     private LocalDate date;
 
-    @PrePersist
-    public void setDefaultTitle() {
-        if (this.title == null || this.title.trim().isEmpty()) {
-            this.title = this.note.split("\\s+")[0];
-        }
-        if (this.date == null) {
-            this.date = LocalDate.now();
-        }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private UserModel user;
+
+    public UserModel getUser() {
+        return user;
     }
 
-    public String getRemoteId() {
-        return remoteId;
-    }
-
-    public void setRemoteId(String remoteId) {
-        this.remoteId = remoteId;
+    public void setUser(UserModel user) {
+        this.user = user;
     }
 
     public Long getId() {
@@ -49,6 +48,14 @@ public class NotesModel {
         this.id = id;
     }
 
+    public String getRemoteId() {
+        return remoteId;
+    }
+
+    public void setRemoteId(String remoteId) {
+        this.remoteId = remoteId;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -57,7 +64,7 @@ public class NotesModel {
         this.title = title;
     }
 
-    public String getNote() {
+    public  String getNote() {
         return note;
     }
 
@@ -72,4 +79,12 @@ public class NotesModel {
     public void setDate(LocalDate date) {
         this.date = date;
     }
+
+    @PrePersist
+    public void setDefaultTitleAndDate() {
+        if (this.title == null || this.title.trim().isEmpty()) {
+            this.title = this.note.split("\\s+")[0];
+        }
+
+}
 }

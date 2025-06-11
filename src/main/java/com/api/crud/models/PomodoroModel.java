@@ -41,6 +41,18 @@ public class PomodoroModel {
     @Column(nullable = false, columnDefinition = "integer default 0")
     private int currentRound;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private UserModel user;
+
+
+    public UserModel getUser() {
+        return user;
+    }
+
+    public void setUser(UserModel user) {
+        this.user = user;
+    }
 
     public int getCurrentRound() {
         return currentRound;
