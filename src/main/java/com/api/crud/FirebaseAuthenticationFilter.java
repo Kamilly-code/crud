@@ -32,6 +32,17 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter implement
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+
+        // Lista de rotas públicas que devem pular a autenticação Firebase
+        if (path.startsWith("/public/")
+                || path.equals("/health")
+                || (path.equals("/users/sync") && "POST".equalsIgnoreCase(request.getMethod()))) {
+            filterChain.doFilter(request, response); // Pula autenticação para essas rotas
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -42,7 +53,6 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter implement
                 request.setAttribute("firebaseUserId", decodedToken.getUid());
                 request.setAttribute("firebaseUserEmail", decodedToken.getEmail());
 
-                // Autenticar no Spring Security
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 decodedToken.getUid(), null, List.of() // Nenhuma autoridade
@@ -55,6 +65,8 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter implement
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido ou expirado");
             }
         } else {
+            // Em vez de negar aqui, você pode deixar passar e deixar o Spring Security decidir
+            // Mas se quiser negar para rotas autenticadas, pode deixar como está
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token ausente");
         }
     }
