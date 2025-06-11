@@ -14,7 +14,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://yamanote.proxy.rlwy.net:33909/railway
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: PBePqAltHfEwiGBVZfKAArZKznbBIDTN
-      JWT_SECRET: "segredoForte123"
+      JWT_SECRET: "yourSecretKey"
     ports:
       - "4000:4000"
     depends_on:
