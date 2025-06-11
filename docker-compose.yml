@@ -11,7 +11,7 @@ services:
   app:
     build: .
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://clouddy:m1vNW1mgCWTl5Z1874j1aHoFOnfSYwLK@dpg-d14k7te3jp1c73bgpokg-a.oregon-postgres.render.com/clouddydatabase
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dpg-d14k7te3jp1c73bgpokg-a.oregon-postgres.render.com:5432/clouddydatabase
       SPRING_DATASOURCE_USERNAME: clouddy
       SPRING_DATASOURCE_PASSWORD: m1vNW1mgCWTl5Z1874j1aHoFOnfSYwLK
     ports:
