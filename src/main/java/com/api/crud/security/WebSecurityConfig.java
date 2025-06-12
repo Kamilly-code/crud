@@ -9,6 +9,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,10 +27,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 
 @Configuration
 public class WebSecurityConfig extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(WebSecurityConfig.class);
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
 
@@ -73,8 +77,8 @@ public class WebSecurityConfig extends OncePerRequestFilter {
             return;
         }
 
+        String token = authHeader.substring(7);
         try {
-            String token = authHeader.substring(7);
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
 
             // Adicione os atributos ao request
@@ -83,13 +87,14 @@ public class WebSecurityConfig extends OncePerRequestFilter {
 
             // Configure a autenticação no Spring Security
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    decodedToken.getUid(), null, List.of()
+                    decodedToken.getUid(), null, Collections.emptyList()
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
         } catch (FirebaseAuthException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido ou expirado");
+            log.error("Firebase token verification failed", e);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase token");
         }
     }
 
