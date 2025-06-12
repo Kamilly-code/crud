@@ -21,7 +21,7 @@ public class FirebaseConfig  {
         try {
             InputStream serviceAccount = getClass()
                     .getClassLoader()
-                    .getResourceAsStream("firebase-service-account.json");
+                    .getResourceAsStream("firebase/firebase-service-account.json");
 
             if (serviceAccount == null) {
                 throw new IllegalStateException("Arquivo serviceAccount JSON não encontrado!");

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -38,7 +39,7 @@ public class WebSecurityConfig  {
     private final FirebaseAuthenticationFilter firebaseFilter;
 
     @Autowired
-    public WebSecurityConfig(FirebaseAuthenticationFilter firebaseFilter) {
+    public WebSecurityConfig(@Lazy(false)FirebaseAuthenticationFilter firebaseFilter) {
         this.firebaseFilter = firebaseFilter;
     }
 
@@ -60,7 +61,7 @@ public class WebSecurityConfig  {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*")); 
+        configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(AUTHORIZATION_HEADER, "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList(AUTHORIZATION_HEADER));
