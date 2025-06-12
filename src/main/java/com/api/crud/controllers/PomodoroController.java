@@ -65,7 +65,7 @@ public class PomodoroController {
     }
 
     @GetMapping("/ping")
-    public ResponseEntity<String> ping() {
-        return ResponseEntity.ok("pong");
+    public ResponseEntity<String> pingPomodoro() {
+        return ResponseEntity.ok("pong-pomodoro");
     }
 }

@@ -73,7 +73,7 @@ public class TaskController {
     }
 
     @GetMapping("/ping")
-    public ResponseEntity<String> ping() {
-        return ResponseEntity.ok("pong");
+    public ResponseEntity<String> pingTasks() {
+        return ResponseEntity.ok("pong-tasks");
     }
 }

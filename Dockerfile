@@ -19,7 +19,7 @@ RUN sed -i '/<filtering>/d' pom.xml && \
 RUN mvn clean package -DskipTests -B
 
 # --- Etapa final ---
-FROM eclipse-temurin:21-jdk-jammy
+FROM eclipse-temurin:21-jre-alpine as runtime
 
 WORKDIR /app
 
@@ -29,7 +29,8 @@ COPY --from=builder /app/target/*.jar app.jar
 # Define fuso horário
 ENV TZ=Europe/Madrid
 
+
+CMD ["java", "-Xmx256m", "-Xms128m", "-XX:MaxMetaspaceSize=64m", "-XX:+UseSerialGC", "-jar", "app.jar"]
+
 # Exposição da porta (Railway irá mapear automaticamente)
 EXPOSE 8080
-
-CMD ["java", "-jar", "app.jar"]

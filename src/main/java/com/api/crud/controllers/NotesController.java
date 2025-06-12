@@ -92,8 +92,8 @@ public class NotesController {
         return ResponseEntity.ok("Notas deletadas com sucesso!");
     }
     @GetMapping("/ping")
-    public ResponseEntity<String> ping() {
-        return ResponseEntity.ok("pong");
+    public ResponseEntity<String> pingNotes() {
+        return ResponseEntity.ok("pong-notes");
     }
 
 }
