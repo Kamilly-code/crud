@@ -12,19 +12,27 @@ import java.io.InputStream;
 @Configuration
 public class FirebaseConfig {
     @PostConstruct
-    public void initialize() {
+    public void init() {
         try {
-            InputStream serviceAccount = getClass().
-                    getClassLoader().getResourceAsStream("secrets/firebase-service-account3.json");
+            InputStream serviceAccount = getClass()
+                    .getClassLoader()
+                    .getResourceAsStream("secrets/firebase-service-account3.json");
+
+            if (serviceAccount == null) {
+                throw new IllegalStateException("Arquivo serviceAccount JSON não encontrado!");
+            }
+
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
+                System.out.println("✅ Firebase inicializado com sucesso.");
             }
+
         } catch (Exception e) {
-            throw new IllegalArgumentException("Falha ao inicializar Firebase", e);
+            throw new RuntimeException("Erro ao inicializar o Firebase: " + e.getMessage(), e);
         }
     }
 }
