@@ -1,5 +1,6 @@
 package com.api.crud;
 
+import com.api.crud.controllers.NotesController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -7,6 +8,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +24,8 @@ import java.util.List;
 @Component
 public class FirebaseAuthenticationFilter extends OncePerRequestFilter implements Ordered {
 
+    private static final Logger log = LoggerFactory.getLogger(FirebaseAuthenticationFilter.class);
+
     @Override
     public int getOrder() {
         return 1;
@@ -32,6 +37,7 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter implement
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+        log.info("Interceptando rota: {}", request.getRequestURI());
 
         String path = request.getRequestURI();
 
@@ -40,8 +46,7 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter implement
         if (path.startsWith("/public/")
                 || path.equals("/health")
                 || path.equals("/ping")
-                || path.equals("/favicon.ico")
-                || (path.equals("/users/sync") && "POST".equalsIgnoreCase(request.getMethod()))) {
+                || path.equals("/favicon.ico")){
             filterChain.doFilter(request, response); // Pula autenticação para essas rotas
             return;
         }
@@ -52,6 +57,7 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter implement
             String token = authHeader.substring(7);
             try {
                 FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
+                log.info("Token decodificado com sucesso. UID: {}, Email: {}", decodedToken.getUid(), decodedToken.getEmail());
 
                 request.setAttribute("firebaseUserId", decodedToken.getUid());
                 request.setAttribute("firebaseUserEmail", decodedToken.getEmail());

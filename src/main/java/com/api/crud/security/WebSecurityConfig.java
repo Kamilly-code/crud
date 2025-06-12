@@ -30,9 +30,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
-public class WebSecurityConfig extends OncePerRequestFilter {
+public class WebSecurityConfig  {
 
-    private static final Logger log = LoggerFactory.getLogger(WebSecurityConfig.class);
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
 
@@ -57,49 +56,6 @@ public class WebSecurityConfig extends OncePerRequestFilter {
         return http.build();
     }
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-
-        // 1. Permitir endpoints públicos sem autenticação
-        if (request.getRequestURI().equals("/users/sync") ||
-                request.getRequestURI().equals("/health") ||
-                request.getRequestURI().equals("/ping")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // 2. Extrair token do header
-        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header");
-            return;
-        }
-
-        String token = authHeader.substring(7);
-
-        try {
-            // 3. Verificar token Firebase
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
-
-            // 4. Adicionar atributos CRÍTICOS ao request
-            request.setAttribute("firebaseUserId", decodedToken.getUid());
-            request.setAttribute("firebaseUserEmail", decodedToken.getEmail());
-
-            // 5. Configurar autenticação no Spring Security
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    decodedToken.getUid(),
-                    null,
-                    Collections.emptyList()
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            filterChain.doFilter(request, response);
-        } catch (FirebaseAuthException e) {
-            log.error("Firebase token verification failed", e);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase token: " + e.getMessage());
-        }
-    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
