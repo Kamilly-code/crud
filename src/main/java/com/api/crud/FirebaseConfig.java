@@ -8,12 +8,14 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.InputStream;
 
+
 @Configuration
 public class FirebaseConfig {
     @PostConstruct
     public void initialize() {
         try {
-            InputStream serviceAccount = getClass().getResourceAsStream("secrets/firebase-service-account3.json");
+            InputStream serviceAccount = getClass().
+                    getClassLoader().getResourceAsStream("secrets/firebase-service-account3.json");
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
