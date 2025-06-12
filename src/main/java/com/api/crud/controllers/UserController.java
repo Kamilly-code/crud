@@ -39,8 +39,10 @@ public class UserController {
         String firebaseUid = (String) httpRequest.getAttribute("firebaseUserId");
 
         if (firebaseUid == null) {
-            log.error("Firebase UID not found in request attributes");
+            log.warn("firebaseUserId está NULL no request");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } else {
+            log.info("firebaseUserId recebido: {}", firebaseUid);
         }
 
         log.info("Processing sync for UID: {}", firebaseUid);

@@ -1,6 +1,6 @@
 package com.api.crud;
 
-import com.api.crud.controllers.NotesController;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -37,17 +37,14 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter implement
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        log.info("Interceptando rota: {}", request.getRequestURI());
 
         String path = request.getRequestURI();
+        log.info("Interceptando request em {}", path);
 
-
-        // Lista de rotas públicas que devem pular a autenticação Firebase
-        if (path.startsWith("/public/")
-                || path.equals("/health")
-                || path.equals("/ping")
-                || path.equals("/favicon.ico")){
-            filterChain.doFilter(request, response); // Pula autenticação para essas rotas
+        // Ignora rotas públicas
+        if (path.startsWith("/public/") || path.equals("/health") || path.equals("/ping") || path.equals("/favicon.ico")) {
+            log.info("Rota pública liberada: {}", path);
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -57,26 +54,28 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter implement
             String token = authHeader.substring(7);
             try {
                 FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
-                log.info("Token decodificado com sucesso. UID: {}, Email: {}", decodedToken.getUid(), decodedToken.getEmail());
+
+                log.info("Token decodificado com sucesso. UID: {}", decodedToken.getUid());
 
                 request.setAttribute("firebaseUserId", decodedToken.getUid());
                 request.setAttribute("firebaseUserEmail", decodedToken.getEmail());
 
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                decodedToken.getUid(), null, List.of() // Nenhuma autoridade
-                        );
-
+                        new UsernamePasswordAuthenticationToken(decodedToken.getUid(), null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 filterChain.doFilter(request, response);
+
             } catch (FirebaseAuthException e) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido ou expirado");
+                log.error("Token Firebase inválido: {}", e.getMessage());
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token Firebase inválido");
+            } catch (Exception e) {
+                log.error("Erro inesperado no filtro Firebase: {}", e.getMessage(), e);
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Erro interno no filtro");
             }
         } else {
-            // Em vez de negar aqui, você pode deixar passar e deixar o Spring Security decidir
-            // Mas se quiser negar para rotas autenticadas, pode deixar como está
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token ausente");
+            log.warn("Authorization header ausente ou inválido: {}", authHeader);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header ausente ou inválido");
         }
     }
 }
