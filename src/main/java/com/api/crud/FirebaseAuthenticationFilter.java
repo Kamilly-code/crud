@@ -35,9 +35,12 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter implement
 
         String path = request.getRequestURI();
 
+
         // Lista de rotas públicas que devem pular a autenticação Firebase
         if (path.startsWith("/public/")
                 || path.equals("/health")
+                || path.equals("/ping")
+                || path.equals("/favicon.ico")
                 || (path.equals("/users/sync") && "POST".equalsIgnoreCase(request.getMethod()))) {
             filterChain.doFilter(request, response); // Pula autenticação para essas rotas
             return;

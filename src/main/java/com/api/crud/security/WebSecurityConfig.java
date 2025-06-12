@@ -72,7 +72,9 @@ public class WebSecurityConfig extends OncePerRequestFilter {
 
         // Validação do token Firebase
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        log.info("Auth Header: {}", authHeader);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.warn("Authorization header ausente ou inválido: {}", authHeader);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token ausente");
             return;
         }
