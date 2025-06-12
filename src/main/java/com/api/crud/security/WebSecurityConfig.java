@@ -60,7 +60,7 @@ public class WebSecurityConfig  {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*")); // Em produção, defina domínios específicos
+        configuration.setAllowedOrigins(Arrays.asList("*")); 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(AUTHORIZATION_HEADER, "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList(AUTHORIZATION_HEADER));
