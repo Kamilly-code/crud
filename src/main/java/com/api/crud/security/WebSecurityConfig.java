@@ -61,42 +61,43 @@ public class WebSecurityConfig extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
-
-        // Rotas públicas
-        if (path.startsWith("/public/") || path.equals("/health") || path.equals("/ping")
-                || path.equals("/users/sync") || path.equals("/favicon.ico")) {
+        // 1. Permitir endpoints públicos sem autenticação
+        if (request.getRequestURI().equals("/users/sync") ||
+                request.getRequestURI().equals("/health") ||
+                request.getRequestURI().equals("/ping")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Validação do token Firebase
+        // 2. Extrair token do header
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-        log.info("Auth Header: {}", authHeader);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.warn("Authorization header ausente ou inválido: {}", authHeader);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token ausente");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header");
             return;
         }
 
         String token = authHeader.substring(7);
+
         try {
+            // 3. Verificar token Firebase
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
 
-            // Adicione os atributos ao request
+            // 4. Adicionar atributos CRÍTICOS ao request
             request.setAttribute("firebaseUserId", decodedToken.getUid());
             request.setAttribute("firebaseUserEmail", decodedToken.getEmail());
 
-            // Configure a autenticação no Spring Security
+            // 5. Configurar autenticação no Spring Security
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    decodedToken.getUid(), null, Collections.emptyList()
+                    decodedToken.getUid(),
+                    null,
+                    Collections.emptyList()
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
         } catch (FirebaseAuthException e) {
             log.error("Firebase token verification failed", e);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase token");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Firebase token: " + e.getMessage());
         }
     }
 

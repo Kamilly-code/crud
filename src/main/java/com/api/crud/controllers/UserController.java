@@ -33,20 +33,19 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> syncUser(
             @RequestHeader("Authorization") String token,
             @RequestBody FirebaseUserSyncRequest request,
-            HttpServletRequest httpRequest
-    ) {
-        log.info("Token recebido: {}", token);
-        log.info("Token recebido: {}", token);
+            HttpServletRequest httpRequest) {
 
+        // Extrair UID diretamente dos atributos do request
         String firebaseUid = (String) httpRequest.getAttribute("firebaseUserId");
+
         if (firebaseUid == null) {
-            log.info("Firebase UID não encontrado no request");
+            log.error("Firebase UID not found in request attributes");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        log.info("Firebase UID: {}" , firebaseUid);
-
+        log.info("Processing sync for UID: {}", firebaseUid);
         UserModel user = userService.syncUser(request, firebaseUid);
+
         return ResponseEntity.ok(new UserResponseDTO(
                 user.getId(),
                 user.getNombreUser(),
