@@ -16,6 +16,6 @@ services:
       SPRING_DATASOURCE_PASSWORD: PBePqAltHfEwiGBVZfKAArZKznbBIDTN
       JWT_SECRET: "yourSecretKey"
     ports:
-      - "4000:4000"
+      - "8080:8080"
     depends_on:
     - db

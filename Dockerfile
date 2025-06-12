@@ -30,6 +30,6 @@ COPY --from=builder /app/target/*.jar app.jar
 ENV TZ=Europe/Madrid
 
 # Exposição da porta (Railway irá mapear automaticamente)
-EXPOSE 4000
+EXPOSE 8080
 
 CMD ["java", "-jar", "app.jar"]
