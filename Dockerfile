@@ -30,7 +30,7 @@ COPY --from=builder /app/target/*.jar app.jar
 ENV TZ=Europe/Madrid
 
 
-CMD ["java", "-Xmx256m", "-Xms128m", "-XX:MaxMetaspaceSize=512m", "-XX:+UseSerialGC", "-jar", "app.jar"]
+CMD ["java", "-jar", "app.jar"]
 
 # Exposição da porta (Railway irá mapear automaticamente)
 EXPOSE 8080
