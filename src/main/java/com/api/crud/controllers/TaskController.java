@@ -1,5 +1,6 @@
 package com.api.crud.controllers;
 
+import com.api.crud.dto.response.TaskResponseDTO;
 import com.api.crud.models.TaskModel;
 import com.api.crud.dto.request.TaskRequestDTO;
 import com.api.crud.models.UserModel;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/tareas")
@@ -44,22 +46,27 @@ public class TaskController {
     }
 
     @PutMapping("/{remoteId}")
-    public ResponseEntity<TaskModel> updateTaskStatus(
+    public ResponseEntity<TaskResponseDTO> updateTaskStatus(
             @PathVariable String remoteId,
             @RequestBody TaskRequestDTO taskRequestDTO,
             HttpServletRequest request) {
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
         TaskModel updatedTask = taskService.updateTaskStatus(remoteId, taskRequestDTO, userId);
-        return ResponseEntity.ok(updatedTask);
+        return ResponseEntity.ok(new TaskResponseDTO(updatedTask));
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskModel>> getAllTasks(HttpServletRequest request) {
+    public ResponseEntity<List<TaskResponseDTO>> getAllTasks(HttpServletRequest request) {
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        return ResponseEntity.ok(taskService.getTasksByUserId(userId));
+        List<TaskResponseDTO> tasks = taskService.getTasksByUserId(userId)
+                .stream()
+                .map(TaskResponseDTO::new)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(tasks);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{remoteId}")
     public ResponseEntity<String> deleteTask(
             @PathVariable String remoteId,
             HttpServletRequest request) {
