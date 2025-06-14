@@ -1,6 +1,5 @@
 package com.api.crud.controllers;
 
-import com.api.crud.dto.response.TaskResponseDTO;
 import com.api.crud.models.TaskModel;
 import com.api.crud.dto.request.TaskRequestDTO;
 import com.api.crud.models.UserModel;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/tareas")
@@ -45,36 +43,33 @@ public class TaskController {
         return ResponseEntity.ok(task);
     }
 
-    @PutMapping("/{remoteId}")
-    public ResponseEntity<TaskResponseDTO> updateTaskStatus(
-            @PathVariable String remoteId,
-            @RequestBody TaskRequestDTO taskRequestDTO,
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskModel> updateTaskStatus(
+            @PathVariable Long id,
+            @RequestBody TaskRequestDTO taskRequestDTO, // Adicionar TaskRequestDTO
             HttpServletRequest request) {
+
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        TaskModel updatedTask = taskService.updateTaskStatus(remoteId, taskRequestDTO, userId);
-        return ResponseEntity.ok(new TaskResponseDTO(updatedTask));
+        TaskModel updatedTask = taskService.updateTaskStatus(id,taskRequestDTO, userId);
+
+        return ResponseEntity.ok(updatedTask);
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskResponseDTO>> getAllTasks(HttpServletRequest request) {
+    public ResponseEntity<List<TaskModel>> getAllTasks(HttpServletRequest request) {
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        List<TaskResponseDTO> tasks = taskService.getTasksByUserId(userId)
-                .stream()
-                .map(TaskResponseDTO::new)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(tasks);
+        return ResponseEntity.ok(taskService.getTasksByUserId(userId));
     }
 
-    @DeleteMapping("/{remoteId}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTask(
-            @PathVariable String remoteId,
+            @PathVariable Long id,
             HttpServletRequest request) {
 
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        taskService.deleteTask(remoteId, userId);
+        taskService.deleteTask(id, userId);
 
-        return ResponseEntity.ok("Tarea con id " + remoteId + " ha sido eliminada con éxito!");
+        return ResponseEntity.ok("Tarea con id " + id + " ha sido eliminada con éxito!");
     }
 
     @GetMapping("/ping")
