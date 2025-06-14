@@ -94,4 +94,14 @@ public class UserService {
                 });
     }
 
+    public UserModel updateUser(UserModel request, String id) {
+        UserModel user = getUserById(id);
+        user.setNombreUser(request.getNombreUser());
+        user.setEmail(request.getEmail());
+        user.setGenero(request.getGenero());
+        return userRepository.save(user);
+    }
+
+
+
 }

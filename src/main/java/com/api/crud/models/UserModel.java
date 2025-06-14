@@ -1,5 +1,6 @@
 package com.api.crud.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class UserModel {
     private List<PomodoroModel> pomodoros = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<TaskModel> tasks = new ArrayList<>();
 
     public String getId() {
