@@ -39,8 +39,8 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public TaskModel updateTaskStatus(String remoteId, TaskRequestDTO dto, String userId) {
-        TaskModel task = taskRepository.findByRemoteId(userId)
+    public TaskModel updateTaskStatus(String remoteId, TaskRequestDTO dto) {
+        TaskModel task = taskRepository.findByRemoteId(remoteId)
                 .orElseThrow(() -> new TaskFoundException(remoteId));
 
         if (dto.getTarea() != null) {
