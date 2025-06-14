@@ -4,6 +4,8 @@ import com.api.crud.dto.request.FirebaseUserSyncRequest;
 import com.api.crud.manejar_errores.UserNotFoundException;
 import com.api.crud.models.UserModel;
 import com.api.crud.repositories.IUserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -12,11 +14,22 @@ import java.util.Optional;
 @Service
 public class UserService {
     IUserRepository userRepository;
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+
 
     @Autowired
     public UserService(IUserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
+    public UserModel getUserById(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("Usuário não encontrado com ID: {}", userId);
+                    return new UserNotFoundException(userId);
+                });
+    }
+
 
     /*Retornar lista con todos los registros de la tabla UserModel*/
     public List<UserModel> getUsers(){

@@ -15,39 +15,41 @@ import java.util.UUID;
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final UserService userService;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, UserService userService) {
         this.taskRepository = taskRepository;
+        this.userService = userService;
     }
 
-    public TaskModel insertTask(TaskRequestDTO taskRequestDTO, UserModel user) {
-        TaskModel task = new TaskModel();
-        task.setTarea(taskRequestDTO.getTarea());
-        task.setIsCompleted(taskRequestDTO.getCompleted() != null && taskRequestDTO.getCompleted());
 
-        // Usar o remoteId da requisição se existir, senão criar um novo
-        task.setRemoteId(taskRequestDTO.getRemoteId() != null && !taskRequestDTO.getRemoteId().isEmpty()
-                ? taskRequestDTO.getRemoteId()
-                : UUID.randomUUID().toString());
+    public TaskModel insertTask(TaskRequestDTO taskRequestDTO, String userId) {
+       UserModel user = userService.getUserById(userId);
 
-        if (taskRequestDTO.getDate() == null) {
-            throw new IllegalArgumentException("A data da tarefa não pode ser nula");
-        }
-        task.setDate(taskRequestDTO.getDate());
-        task.setUser(user);
+       TaskModel task = new TaskModel();
+       task.setTarea(taskRequestDTO.getTarea());
+       task.setIsCompleted(taskRequestDTO.getCompleted());
+       task.setDate(taskRequestDTO.getDate());
+       task.setUser(user);
+       task.setRemoteId(taskRequestDTO.getRemoteId()!= null ?
+               taskRequestDTO.getRemoteId() : UUID.randomUUID().toString());
+
         return taskRepository.save(task);
     }
 
-    public TaskModel updateTaskStatus(Long id, TaskRequestDTO dto, String userId) {
-        TaskModel task = taskRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new TaskFoundException(id));
+    public TaskModel updateTask(String remoteId, TaskRequestDTO request, String userId) {
+        TaskModel task = taskRepository.findByRemoteIdAndUserId(remoteId, userId)
+                .orElseThrow(() -> new TaskFoundException(remoteId));
 
-        if (dto.getTarea() != null) {
-            task.setTarea(dto.getTarea());
+        if (request.getTarea() != null) {
+            task.setTarea(request.getTarea());
         }
-        if (dto.getDate() != null) {
-            task.setDate(dto.getDate());
+        if (request.getCompleted() != null) {
+            task.setIsCompleted(request.getCompleted());
+        }
+        if (request.getDate() != null) {
+            task.setDate(request.getDate());
         }
 
         return taskRepository.save(task);
@@ -57,10 +59,9 @@ public class TaskService {
         return taskRepository.findByUserId(userId);
     }
 
-    public void deleteTask(long id, String userId) {
-        TaskModel task = taskRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new TaskFoundException(id));
-
+    public void deleteTask(String remoteId, String userId) {
+        TaskModel task = taskRepository.findByRemoteIdAndUserId(remoteId, userId)
+                .orElseThrow(() -> new TaskFoundException(remoteId));
         taskRepository.delete(task);
     }
 }

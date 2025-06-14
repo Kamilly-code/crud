@@ -1,5 +1,7 @@
 package com.api.crud.models;
 
+import com.api.crud.serializer.UserIdSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +27,7 @@ public class TaskModel {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
+    @JsonSerialize(using = UserIdSerializer.class)
     private UserModel user;
 
 

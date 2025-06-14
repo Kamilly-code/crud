@@ -13,7 +13,7 @@ public class TaskRequestDTO {
     @NotNull(message = "El estado de la tarea es obligatorio")
     private Boolean isCompleted;
     private String remoteId;
-    private String userId;
+
 
     @NotNull(message = "La fecha no puede estar vacía")
     private LocalDate date;
@@ -42,13 +42,6 @@ public class TaskRequestDTO {
         this.remoteId = remoteId;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     public LocalDate getDate() {
         return date;
