@@ -39,9 +39,9 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public TaskModel updateTaskStatus(Long id, TaskRequestDTO dto, String userId) {
-        TaskModel task = taskRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new TaskFoundException(id));
+    public TaskModel updateTaskStatus(String remoteId, TaskRequestDTO dto, String userId) {
+        TaskModel task = taskRepository.findByRemoteId(userId)
+                .orElseThrow(() -> new TaskFoundException(remoteId));
 
         if (dto.getTarea() != null) {
             task.setTarea(dto.getTarea());
@@ -59,7 +59,8 @@ public class TaskService {
 
     public void deleteTask(long id, String userId) {
         TaskModel task = taskRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new TaskFoundException(id));
+                .orElseThrow(() -> new TaskFoundException(userId));
+
 
         taskRepository.delete(task);
     }

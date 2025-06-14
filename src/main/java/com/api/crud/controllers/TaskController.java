@@ -43,15 +43,13 @@ public class TaskController {
         return ResponseEntity.ok(task);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{remoteId}")
     public ResponseEntity<TaskModel> updateTaskStatus(
-            @PathVariable Long id,
-            @RequestBody TaskRequestDTO taskRequestDTO, // Adicionar TaskRequestDTO
+            @PathVariable String remoteId,
+            @RequestBody TaskRequestDTO taskRequestDTO,
             HttpServletRequest request) {
-
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        TaskModel updatedTask = taskService.updateTaskStatus(id,taskRequestDTO, userId);
-
+        TaskModel updatedTask = taskService.updateTaskStatus(remoteId, taskRequestDTO, userId);
         return ResponseEntity.ok(updatedTask);
     }
 
