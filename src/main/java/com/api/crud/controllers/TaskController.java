@@ -48,8 +48,8 @@ public class TaskController {
             @PathVariable String remoteId,
             @RequestBody TaskRequestDTO taskRequestDTO,
             HttpServletRequest request) {
-      //  String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        TaskModel updatedTask = taskService.updateTaskStatus(remoteId, taskRequestDTO);
+        String userId = (String) request.getAttribute(FIREBASE_USER_ID);
+        TaskModel updatedTask = taskService.updateTaskStatus(remoteId, taskRequestDTO, userId);
         return ResponseEntity.ok(updatedTask);
     }
 
@@ -61,13 +61,13 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteTask(
-            @PathVariable Long id,
+            @PathVariable String remoteId,
             HttpServletRequest request) {
 
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        taskService.deleteTask(id, userId);
+        taskService.deleteTask(remoteId, userId);
 
-        return ResponseEntity.ok("Tarea con id " + id + " ha sido eliminada con éxito!");
+        return ResponseEntity.ok("Tarea con id " + remoteId + " ha sido eliminada con éxito!");
     }
 
     @GetMapping("/ping")

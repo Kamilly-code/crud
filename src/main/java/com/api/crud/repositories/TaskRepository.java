@@ -2,6 +2,8 @@ package com.api.crud.repositories;
 
 import com.api.crud.models.TaskModel;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,5 +15,8 @@ public interface TaskRepository extends JpaRepository<TaskModel,Long> {
 
     Optional<TaskModel> findByRemoteId(String remoteId);
 
-    Optional<TaskModel> findByIdAndUserId(Long id, String userId);
+
+    @Query("SELECT t FROM TaskModel t WHERE t.remoteId = :remoteId AND t.user.id = :userId")
+    Optional<TaskModel> findByRemoteIdAndUserId(@Param("remoteId") String remoteId,
+                                                @Param("userId") String userId);
 }

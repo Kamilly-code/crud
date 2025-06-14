@@ -39,16 +39,14 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public TaskModel updateTaskStatus(String remoteId, TaskRequestDTO dto) {
-        TaskModel task = taskRepository.findByRemoteId(remoteId)
+    public TaskModel updateTaskStatus(String remoteId, TaskRequestDTO dto, String userId) {
+        TaskModel task = taskRepository.findByRemoteIdAndUserId(remoteId, userId)
                 .orElseThrow(() -> new TaskFoundException(remoteId));
 
-        if (dto.getTarea() != null) {
-            task.setTarea(dto.getTarea());
-        }
-        if (dto.getDate() != null) {
-            task.setDate(dto.getDate());
-        }
+        if (dto.getTarea() != null) task.setTarea(dto.getTarea());
+        if (dto.getCompleted() != null) task.setIsCompleted(dto.getCompleted());
+        if (dto.getDate() != null) task.setDate(dto.getDate());
+
 
         return taskRepository.save(task);
     }
@@ -57,11 +55,11 @@ public class TaskService {
         return taskRepository.findByUserId(userId);
     }
 
-    public void deleteTask(long id, String userId) {
-        TaskModel task = taskRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new TaskFoundException(userId));
-
+    public void deleteTask(String remoteId, String userId) {
+        TaskModel task = taskRepository.findByRemoteIdAndUserId(remoteId, userId)
+                .orElseThrow(() -> new TaskFoundException(
+                        "Tarea no encontrada o no tienes permisos"));
 
         taskRepository.delete(task);
-    }
+}
 }
