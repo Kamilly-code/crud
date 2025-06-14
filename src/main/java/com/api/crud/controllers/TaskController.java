@@ -48,8 +48,8 @@ public class TaskController {
             @PathVariable String remoteId,
             @RequestBody TaskRequestDTO taskRequestDTO,
             HttpServletRequest request) {
-        String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        TaskModel updatedTask = taskService.updateTaskStatus(remoteId, taskRequestDTO, userId);
+      //  String userId = (String) request.getAttribute(FIREBASE_USER_ID);
+        TaskModel updatedTask = taskService.updateTaskStatus(remoteId, taskRequestDTO);
         return ResponseEntity.ok(updatedTask);
     }
 
