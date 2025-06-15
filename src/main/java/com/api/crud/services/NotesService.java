@@ -1,11 +1,14 @@
 package com.api.crud.services;
 
+import com.api.crud.FirebaseConfig;
 import com.api.crud.manejar_errores.NoteNotFoundException;
 import com.api.crud.dto.request.NoteRequestDTO;
 import com.api.crud.models.NotesModel;
 import com.api.crud.models.UserModel;
 import com.api.crud.repositories.NotesRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.UUID;
 @Service
 public class NotesService {
     private final NotesRepository notesRepository;
+    private static final Logger log = LoggerFactory.getLogger(NotesService.class);
 
     @Autowired
     public NotesService(NotesRepository notesRepository) {
@@ -53,20 +57,26 @@ public class NotesService {
 
     @Transactional
     public NotesModel updateNote(String remoteId, NoteRequestDTO dto, String userId) {
-        NotesModel existingNote = notesRepository.findByRemoteIdAndUserId(remoteId, userId)
-                .orElseThrow(() -> new NoteNotFoundException(remoteId));
+        Optional<NotesModel> existing = notesRepository.findByRemoteIdAndUserId(remoteId, userId);
 
-        if(dto.getTitle() != null) {
-            existingNote.setTitle(dto.getTitle());
-        }
-        if(dto.getNote() != null) {
-            existingNote.setNote(dto.getNote());
-        }
-        if(dto.getDate() != null) {
-            existingNote.setDate(dto.getDate());
+        if (existing.isEmpty()) {
+            log.warn("Tentativa de atualizar nota inexistente com remoteId: {}", remoteId);
+            throw new NoteNotFoundException(remoteId);
         }
 
-        return notesRepository.save(existingNote);
+        NotesModel model = existing.get();
+
+        if (dto.getTitle() != null) {
+            model.setTitle(dto.getTitle());
+        }
+        if (dto.getNote() != null) {
+            model.setNote(dto.getNote());
+        }
+        if (dto.getDate() != null) {
+            model.setDate(dto.getDate());
+        }
+
+        return notesRepository.save(model);
     }
 
 
