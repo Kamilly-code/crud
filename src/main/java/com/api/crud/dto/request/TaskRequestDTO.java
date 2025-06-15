@@ -18,6 +18,10 @@ public class TaskRequestDTO {
     @NotNull(message = "La fecha no puede estar vacía")
     private LocalDate date;
 
+    public Boolean getIsCompleted() {
+        return isCompleted;
+    }
+
     public  String getTarea() {
         return tarea;
     }

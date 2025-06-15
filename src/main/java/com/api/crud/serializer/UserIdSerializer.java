@@ -11,6 +11,10 @@ public class UserIdSerializer extends JsonSerializer<UserModel> {
     @Override
     public void serialize(UserModel value, JsonGenerator gen, SerializerProvider serializers)
             throws IOException {
-        gen.writeString(value.getId());
+        if (value == null) {
+            gen.writeNull();
+        } else {
+            gen.writeString(value.getId());
+        }
     }
 }

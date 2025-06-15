@@ -25,17 +25,24 @@ public class TaskService {
 
 
     public TaskModel insertTask(TaskRequestDTO taskRequestDTO, String userId) {
-       UserModel user = userService.getUserById(userId);
+        try {
+            UserModel user = userService.getUserById(userId);
 
-       TaskModel task = new TaskModel();
-       task.setTarea(taskRequestDTO.getTarea());
-       task.setIsCompleted(taskRequestDTO.getCompleted());
-       task.setDate(taskRequestDTO.getDate());
-       task.setUser(user);
-       task.setRemoteId(taskRequestDTO.getRemoteId()!= null ?
-               taskRequestDTO.getRemoteId() : UUID.randomUUID().toString());
+            TaskModel task = new TaskModel();
+            task.setTarea(taskRequestDTO.getTarea());
+            task.setIsCompleted(taskRequestDTO.getIsCompleted() != null ?
+                    taskRequestDTO.getIsCompleted() : false);
+            task.setDate(taskRequestDTO.getDate());
+            task.setUser(user);
 
-        return taskRepository.save(task);
+            // Gera um remoteId se não foi fornecido
+            task.setRemoteId(taskRequestDTO.getRemoteId() != null ?
+                    taskRequestDTO.getRemoteId() : UUID.randomUUID().toString());
+
+            return taskRepository.save(task);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al crear la tarea: " + e.getMessage(), e);
+        }
     }
 
     public TaskModel updateTask(String remoteId, TaskRequestDTO request, String userId) {

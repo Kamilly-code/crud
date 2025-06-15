@@ -7,12 +7,16 @@ import com.api.crud.models.UserModel;
 import com.api.crud.services.TaskService;
 import com.api.crud.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -21,7 +25,7 @@ public class TaskController {
 
 
     private final TaskService taskService;
-
+    private static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
     private static final String FIREBASE_USER_ID = "firebaseUserId"; // Defined constant
     //private static final String FIREBASE_USER_EMAIL = "firebaseUserEmail";
@@ -32,15 +36,26 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponseDTO> insertTask(
-            @RequestBody TaskRequestDTO taskRequestDTO,
+    public ResponseEntity<?> insertTask(
+            @Valid @RequestBody TaskRequestDTO taskRequestDTO,
             HttpServletRequest request) {
 
-        String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        TaskModel task = taskService.insertTask(taskRequestDTO,userId);
+        try {
+            String userId = (String) request.getAttribute(FIREBASE_USER_ID);
+            log.info("Creando tarea para usuario: {}", userId);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new TaskResponseDTO(task));
+            TaskModel task = taskService.insertTask(taskRequestDTO, userId);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new TaskResponseDTO(task));
+
+        } catch (Exception e) {
+            log.error("Error al crear tarea", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "error", "Error al crear la tarea",
+                            "message", e.getMessage()
+                    ));
+        }
     }
 
     @PutMapping("/{remoteId}")
