@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Base64;
 
 
 @Configuration
@@ -19,13 +21,14 @@ public class FirebaseConfig  {
     @PostConstruct
     public void init() {
         try {
-            InputStream serviceAccount = getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("firebase/firebase-service-account.json");
+            String base64 = System.getenv("FIREBASE_CONFIG_BASE64");
 
-            if (serviceAccount == null) {
-                throw new IllegalStateException("Arquivo serviceAccount JSON não encontrado!");
+            if (base64 == null || base64.isEmpty()) {
+                throw new IllegalStateException("Variável de ambiente FIREBASE_CONFIG_BASE64 não encontrada!");
             }
+
+            byte[] decoded = Base64.getDecoder().decode(base64);
+            InputStream serviceAccount = new ByteArrayInputStream(decoded);
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -33,10 +36,11 @@ public class FirebaseConfig  {
 
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
-                log.info("✅ Firebase inicializado com sucesso.");
+                log.info("✅ Firebase inicializado com sucesso (via variável de ambiente Base64).");
             }
 
         } catch (Exception e) {
+            log.error("❌ Erro ao inicializar o Firebase", e);
             throw new RuntimeException("Erro ao inicializar o Firebase: " + e.getMessage(), e);
         }
     }
