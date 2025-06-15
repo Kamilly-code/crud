@@ -31,11 +31,7 @@ public class PomodoroController {
     public ResponseEntity<PomodoroResponseDTO> getPomodorosSettings(HttpServletRequest request) {
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
         PomodoroResponseDTO dto = pomodoroService.getPomodoroSettings(userId);
-        if (dto != null) {
-            return ResponseEntity.ok(dto);
-        } else {
-            return ResponseEntity.noContent().build();
-        }
+        return dto != null ? ResponseEntity.ok(dto) : ResponseEntity.noContent().build();
     }
 
     @PostMapping
@@ -47,21 +43,22 @@ public class PomodoroController {
         return ResponseEntity.ok(pomodoroService.insertPomodoro(dto, userId));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{remoteId}")
     public ResponseEntity<PomodoroResponseDTO> updatePomodoro(
-            @PathVariable Long id,
+            @PathVariable String remoteId,
             @RequestBody PomodoroRequestDTO dto,
             HttpServletRequest request) {
 
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        return ResponseEntity.ok(pomodoroService.updatePomodoro(id, dto, userId));
+        return ResponseEntity.ok(pomodoroService.updatePomodoro(remoteId, dto, userId));
     }
+
 
     @DeleteMapping
     public ResponseEntity<String> deleteAllPomodoroSettings(HttpServletRequest request) {
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
         pomodoroService.deleteAll(userId);
-        return ResponseEntity.ok("Todas las configuraciones del pomodoro fueron borradas con éxito!");
+        return ResponseEntity.ok("Todas as configurações do pomodoro foram borradas com sucesso!");
     }
 
     @GetMapping("/ping")

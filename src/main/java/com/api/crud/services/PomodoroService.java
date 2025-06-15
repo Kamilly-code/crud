@@ -1,5 +1,6 @@
 package com.api.crud.services;
 
+import com.api.crud.PomodoroState;
 import com.api.crud.dto.request.PomodoroRequestDTO;
 import com.api.crud.manejar_errores.PomodoroNotFoundException;
 import com.api.crud.manejar_errores.UserNotFoundException;
@@ -13,17 +14,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
+import static com.api.crud.mapper.PomodoroMapper.toResponseDTO;
+import static com.api.crud.mapper.PomodoroMapper.updateModel;
 
 @Service
 public class PomodoroService {
 
     private final PomodoroRepository pomodoroRepository;
-    private final UserService userService;
+
 
     @Autowired
-    public PomodoroService(PomodoroRepository pomodoroRepository, UserService userService) {
+    public PomodoroService(PomodoroRepository pomodoroRepository) {
         this.pomodoroRepository = pomodoroRepository;
-        this.userService = userService;
     }
 
     public List<PomodoroModel> getPomodoros(String userId) {
@@ -38,38 +42,29 @@ public class PomodoroService {
                 .orElse(null);
     }
 
-    public PomodoroResponseDTO insertPomodoro(PomodoroRequestDTO requestDTO, String firebaseUserId) {
-        if (requestDTO.getUserId() == null || !requestDTO.getUserId().equals(firebaseUserId)) {
-            throw new IllegalArgumentException("UserId no body não corresponde ao usuário autenticado.");
-        }
+    public PomodoroResponseDTO insertPomodoro(PomodoroRequestDTO requestDTO, String userId) {
+        PomodoroModel model = new PomodoroModel();
+        updateModel(model, requestDTO);
+        model.setRemoteId(requestDTO.getRemoteId() != null ?
+                requestDTO.getRemoteId() : UUID.randomUUID().toString());
 
-        UserModel user = userService.findById(firebaseUserId)
-                .orElseThrow(() -> new UserNotFoundException(firebaseUserId));
-
-        Optional<PomodoroModel> existing = pomodoroRepository.findByUserId(firebaseUserId).stream().findFirst();
-        PomodoroModel model = existing.orElseGet(PomodoroModel::new);
-
-        PomodoroMapper.updateModel(model, requestDTO);
+        UserModel user = new UserModel();
+        user.setId(userId);
         model.setUser(user);
 
         PomodoroModel saved = pomodoroRepository.save(model);
-        return PomodoroMapper.toResponseDTO(saved);
+        return toResponseDTO(saved);
     }
 
 
 
-    public PomodoroResponseDTO updatePomodoro(Long id, PomodoroRequestDTO dto, String firebaseUserId) {
-        if (dto.getUserId() == null || !dto.getUserId().equals(firebaseUserId)) {
-            throw new IllegalArgumentException("UserId no body não corresponde ao usuário autenticado.");
-        }
+    public PomodoroResponseDTO updatePomodoro(String remoteId, PomodoroRequestDTO dto, String userId) {
+        PomodoroModel model = pomodoroRepository.findByRemoteIdAndUserId(remoteId, userId)
+                .orElseThrow(() -> new PomodoroNotFoundException(remoteId));
 
-        PomodoroModel model = pomodoroRepository.findByIdAndUserId(id, firebaseUserId)
-                .orElseThrow(() -> new PomodoroNotFoundException(id));
-
-        PomodoroMapper.updateModel(model, dto);
-        return PomodoroMapper.toResponseDTO(pomodoroRepository.save(model));
+        updateModel(model, dto);
+        return toResponseDTO(pomodoroRepository.save(model));
     }
-
 
     public PomodoroResponseDTO getPomodoroSettings(String userId) {
         return pomodoroRepository.findByUserId(userId)
@@ -81,9 +76,24 @@ public class PomodoroService {
 
 
 
-
     public void deleteAll(String userId) {
         pomodoroRepository.deleteByUserId(userId);
     }
 
+    private void updateModel(PomodoroModel model, PomodoroRequestDTO dto) {
+        model.setFocusTime(dto.getFocusTime());
+        model.setShortBreakTime(dto.getShortBreakTime());
+        model.setLongBreakTime(dto.getLongBreakTime());
+        model.setRounds(dto.getRounds());
+        model.setTotalMinutes(dto.getTotalMinutes());
+        model.setCurrentRound(dto.getCurrentRound());
+
+        if (dto.getCurrentState() != null) {
+            model.setCurrentState(PomodoroState.valueOf(dto.getCurrentState()));
+        }
+
+        if (dto.getLastUpdatedDate() != null) {
+            model.setLastUpdatedDate(dto.getLastUpdatedDate());
+        }
+    }
 }

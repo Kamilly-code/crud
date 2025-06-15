@@ -11,9 +11,11 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/notes")
@@ -21,67 +23,56 @@ public class NotesController {
 
     private static final Logger log = LoggerFactory.getLogger(NotesController.class);
     private static final String FIREBASE_USER_ID = "firebaseUserId"; // Defined constant
-    private static final String FIREBASE_USER_EMAIL = "firebaseUserEmail";
+    //private static final String FIREBASE_USER_EMAIL = "firebaseUserEmail";
 
     private final NotesService notesService;
-    private final UserService userService;
 
     @Autowired
-    public NotesController(NotesService notesService, UserService userService) {
+    public NotesController(NotesService notesService) {
         this.notesService = notesService;
-        this.userService = userService;
     }
 
 
     @GetMapping("/my-notes")
-    public ResponseEntity<List<NotesModel>> getUserNotes(HttpServletRequest request) {
+    public ResponseEntity<List<NoteResponseDTO>> getUserNotes(HttpServletRequest request) {
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        return ResponseEntity.ok(notesService.findByUserId(userId));
+        List<NoteResponseDTO> notes = notesService.findByUserId(userId).stream()
+                .map(NoteResponseDTO::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(notes);
     }
 
     @PostMapping
     public ResponseEntity<NoteResponseDTO> insertNote(@RequestBody @Valid NoteRequestDTO noteDto, HttpServletRequest request) {
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        String userEmail = (String) request.getAttribute(FIREBASE_USER_EMAIL);
-        UserModel user = userService.getOrCreateUser(userId,userEmail);
-
-        NotesModel note = notesService.insertNote(noteDto, user);
-
-        NoteResponseDTO response = new NoteResponseDTO();
-        response.setId(note.getId());
-        response.setRemoteId(note.getRemoteId());
-        response.setTitle(note.getTitle());
-        response.setNote(note.getNote());
-        response.setDate(note.getDate());
-
-        return ResponseEntity.ok(response);
+        NotesModel note = notesService.insertNote(noteDto, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new NoteResponseDTO(note));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<NotesModel> updateNote(
-            @PathVariable Long id,
+    @PutMapping("/{remoteId}")
+    public ResponseEntity<NoteResponseDTO> updateNote(
+            @PathVariable String remoteId,
             @RequestBody NoteRequestDTO noteDto,
             HttpServletRequest request) {
 
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
 
         if (log.isInfoEnabled()) {
-            log.info("Atualizando nota ID: {} com dados: {}", id, noteDto);
+            log.info("Atualizando nota ID: {} com dados: {}", remoteId, noteDto);
         }
 
-        NotesModel updatedNote = notesService.updateNote(id, noteDto, userId);
-
-        return ResponseEntity.ok(updatedNote);
+        NotesModel updatedNote = notesService.updateNote(remoteId, noteDto, userId);
+        return ResponseEntity.ok(new NoteResponseDTO(updatedNote));
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/{remoteId}")
     public ResponseEntity<String> deleteNoteById(
-            @PathVariable Long id,
+            @PathVariable String remoteId,
             HttpServletRequest request) {
 
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        notesService.deleteNoteById(id, userId);
-        return ResponseEntity.ok("Nota deletada com sucesso!");
+        notesService.deleteNoteByRemoteId(remoteId, userId);
+        return ResponseEntity.noContent().build();
     }
 
 

@@ -41,10 +41,20 @@ public class PomodoroModel {
     @Column(nullable = false, columnDefinition = "integer default 0")
     private int currentRound;
 
+    @Column(unique = true, nullable = false, updatable = false)
+    private String remoteId;
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
     private UserModel user;
 
+    public String getRemoteId() {
+        return remoteId;
+    }
+
+    public void setRemoteId(String remoteId) {
+        this.remoteId = remoteId;
+    }
 
     public UserModel getUser() {
         return user;

@@ -28,7 +28,7 @@ public class NotesService {
         return notesRepository.findByUserId(userId);
     }
 
-    public  NotesModel insertNote(NoteRequestDTO dto ,UserModel user){
+    public  NotesModel insertNote(NoteRequestDTO dto , String userId){
         NotesModel note = new NotesModel();
         note.setTitle(dto.getTitle());
         note.setNote(dto.getNote());
@@ -41,14 +41,17 @@ public class NotesService {
             throw new IllegalArgumentException("A data da nota não pode ser nula");
         }
         note.setDate(dto.getDate());
+        UserModel user = new UserModel();
+        user.setId(userId);
         note.setUser(user);
+
         return notesRepository.save(note);
     }
 
     @Transactional
-    public NotesModel updateNote(Long id, NoteRequestDTO dto, String userId) {
-        NotesModel existingNote = notesRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new NoteNotFoundException(id));
+    public NotesModel updateNote(String remoteId, NoteRequestDTO dto, String userId) {
+        NotesModel existingNote = notesRepository.findByRemoteIdAndUserId(remoteId, userId)
+                .orElseThrow(() -> new NoteNotFoundException(remoteId));
 
         if(dto.getTitle() != null) {
             existingNote.setTitle(dto.getTitle());
@@ -63,18 +66,16 @@ public class NotesService {
         return notesRepository.save(existingNote);
     }
 
-    public void deleteNoteById(Long id, String userId) {
-        if (!notesRepository.existsByIdAndUserId(id, userId)) {
-            throw new NoteNotFoundException(id);
-        }
-        notesRepository.deleteById(id);
-    }
-
 
     public void deleteAllNotes() {
         notesRepository.deleteAll();
     }
 
+    public void deleteNoteByRemoteId(String remoteId, String userId) {
+        NotesModel note = notesRepository.findByRemoteIdAndUserId(remoteId, userId)
+                .orElseThrow(() -> new NoteNotFoundException(remoteId));
+        notesRepository.delete(note);
+    }
 
     public void deleteAllNotesByUserId(String userId) {
         List<NotesModel> userNotes = notesRepository.findByUserId(userId);

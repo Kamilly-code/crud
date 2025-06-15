@@ -11,7 +11,9 @@ import java.util.Optional;
 public interface NotesRepository extends JpaRepository<NotesModel,Long> {
     List<NotesModel> findByUserId(String userId);
 
-    Optional<NotesModel> findByIdAndUserId(Long id, String userId);
+    Optional<NotesModel> findByRemoteIdAndUserId(String remoteId, String userId);
+
+    boolean existsByRemoteIdAndUserId(String remoteId, String userId);
 
     boolean existsByIdAndUserId(Long id, String userId);
 }

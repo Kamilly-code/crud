@@ -101,7 +101,4 @@ public class UserService {
         user.setGenero(request.getGenero());
         return userRepository.save(user);
     }
-
-
-
 }
