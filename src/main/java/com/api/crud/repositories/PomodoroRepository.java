@@ -14,5 +14,5 @@ public interface PomodoroRepository extends JpaRepository<PomodoroModel,Long> {
 
     Optional<PomodoroModel> findByRemoteIdAndUserId(String remoteId, String userId);
 
-    void deleteByUserId(String userId);
+    void deleteAllByUserId(String userId);
 }

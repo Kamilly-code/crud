@@ -23,12 +23,16 @@ import static com.api.crud.mapper.PomodoroMapper.updateModel;
 public class PomodoroService {
 
     private final PomodoroRepository pomodoroRepository;
-
+    private final UserService userRepository;
 
     @Autowired
-    public PomodoroService(PomodoroRepository pomodoroRepository) {
+    public PomodoroService(PomodoroRepository pomodoroRepository, UserService userRepository) {
         this.pomodoroRepository = pomodoroRepository;
+        this.userRepository = userRepository;
     }
+
+
+
 
     public List<PomodoroModel> getPomodoros(String userId) {
         return pomodoroRepository.findByUserId(userId);
@@ -43,18 +47,21 @@ public class PomodoroService {
     }
 
     public PomodoroResponseDTO insertPomodoro(PomodoroRequestDTO requestDTO, String userId) {
-        PomodoroModel model = new PomodoroModel();
-        updateModel(model, requestDTO);
-        model.setRemoteId(requestDTO.getRemoteId() != null ?
-                requestDTO.getRemoteId() : UUID.randomUUID().toString());
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
-        UserModel user = new UserModel();
-        user.setId(userId);
+        PomodoroModel model = PomodoroMapper.toModel(requestDTO);
         model.setUser(user);
 
+        // Garante que remoteId não seja nulo
+        if (model.getRemoteId() == null || model.getRemoteId().trim().isEmpty()) {
+            model.setRemoteId(UUID.randomUUID().toString());
+        }
+
         PomodoroModel saved = pomodoroRepository.save(model);
-        return toResponseDTO(saved);
+        return PomodoroMapper.toResponseDTO(saved);
     }
+
 
 
 
@@ -62,22 +69,20 @@ public class PomodoroService {
         PomodoroModel model = pomodoroRepository.findByRemoteIdAndUserId(remoteId, userId)
                 .orElseThrow(() -> new PomodoroNotFoundException(remoteId));
 
-        updateModel(model, dto);
-        return toResponseDTO(pomodoroRepository.save(model));
+        PomodoroMapper.updateModel(model, dto);
+        PomodoroModel updated = pomodoroRepository.save(model);
+
+        return PomodoroMapper.toResponseDTO(updated);
     }
 
     public PomodoroResponseDTO getPomodoroSettings(String userId) {
-        return pomodoroRepository.findByUserId(userId)
-                .stream()
-                .findFirst()
-                .map(PomodoroMapper::toResponseDTO)
-                .orElse(null);
+        return findByUserId(userId);
     }
 
 
 
     public void deleteAll(String userId) {
-        pomodoroRepository.deleteByUserId(userId);
+        pomodoroRepository.deleteAllByUserId(userId);
     }
 
     private void updateModel(PomodoroModel model, PomodoroRequestDTO dto) {

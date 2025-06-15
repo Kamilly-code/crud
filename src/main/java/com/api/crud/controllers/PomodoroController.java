@@ -47,8 +47,7 @@ public class PomodoroController {
             PomodoroResponseDTO response = pomodoroService.insertPomodoro(dto, userId);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            e.printStackTrace(); // ou log.error(...)
-
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(
                             "error", "Erro ao criar pomodoro",
