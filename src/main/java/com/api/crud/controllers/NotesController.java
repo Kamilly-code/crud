@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -43,10 +44,16 @@ public class NotesController {
     }
 
     @PostMapping
-    public ResponseEntity<NoteResponseDTO> insertNote(@RequestBody @Valid NoteRequestDTO noteDto, HttpServletRequest request) {
-        String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        NotesModel note = notesService.insertNote(noteDto, userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new NoteResponseDTO(note));
+    public ResponseEntity<?> insertNote(@RequestBody @Valid NoteRequestDTO noteDto, HttpServletRequest request) {
+        try {
+            String userId = (String) request.getAttribute(FIREBASE_USER_ID);
+            NotesModel note = notesService.insertNote(noteDto, userId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new NoteResponseDTO(note));
+        } catch (Exception e) {
+            log.error("Erro ao criar nota", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Erro ao criar nota", "message", e.getMessage()));
+        }
     }
 
     @PutMapping("/{remoteId}")
@@ -65,7 +72,7 @@ public class NotesController {
         return ResponseEntity.ok(new NoteResponseDTO(updatedNote));
     }
 
-    @PutMapping("/{remoteId}")
+    @DeleteMapping("/{remoteId}")
     public ResponseEntity<String> deleteNoteById(
             @PathVariable String remoteId,
             HttpServletRequest request) {

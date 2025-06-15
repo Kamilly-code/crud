@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "pomodoros")
 public class PomodoroModel {
@@ -41,7 +43,7 @@ public class PomodoroModel {
     @Column(nullable = false, columnDefinition = "integer default 0")
     private int currentRound;
 
-    @Column(unique = true, nullable = false, updatable = false)
+    @Column(unique = true, nullable = true, updatable = false)
     private String remoteId;
 
     @ManyToOne
@@ -134,5 +136,12 @@ public class PomodoroModel {
 
     public void setLastUpdatedDate(String lastUpdatedDate) {
         this.lastUpdatedDate = lastUpdatedDate;
+    }
+
+    @PrePersist
+    public void generateRemoteIdIfMissing() {
+        if (this.remoteId == null || this.remoteId.trim().isEmpty()) {
+            this.remoteId = UUID.randomUUID().toString();
+        }
     }
 }

@@ -2,11 +2,15 @@ package com.api.crud.controllers;
 
 import com.api.crud.dto.request.PomodoroRequestDTO;
 import com.api.crud.dto.response.PomodoroResponseDTO;
+import com.api.crud.models.PomodoroModel;
 import com.api.crud.services.PomodoroService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 
 @RestController
@@ -35,12 +39,22 @@ public class PomodoroController {
     }
 
     @PostMapping
-    public ResponseEntity<PomodoroResponseDTO> insertPomodoro(
+    public ResponseEntity<?> insertPomodoro(
             @RequestBody PomodoroRequestDTO dto,
             HttpServletRequest request) {
+        try {
+            String userId = (String) request.getAttribute(FIREBASE_USER_ID);
+            PomodoroResponseDTO response = pomodoroService.insertPomodoro(dto, userId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            e.printStackTrace(); // ou log.error(...)
 
-        String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        return ResponseEntity.ok(pomodoroService.insertPomodoro(dto, userId));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "error", "Erro ao criar pomodoro",
+                            "message", e.getMessage()));
+        }
+
     }
 
     @PutMapping("/{remoteId}")

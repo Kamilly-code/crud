@@ -70,7 +70,7 @@ public class NotesService {
     public void deleteAllNotes() {
         notesRepository.deleteAll();
     }
-
+    @Transactional
     public void deleteNoteByRemoteId(String remoteId, String userId) {
         NotesModel note = notesRepository.findByRemoteIdAndUserId(remoteId, userId)
                 .orElseThrow(() -> new NoteNotFoundException(remoteId));
