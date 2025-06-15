@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -29,23 +30,25 @@ public class NotesService {
     }
 
     public  NotesModel insertNote(NoteRequestDTO dto , String userId){
-        NotesModel note = new NotesModel();
-        note.setTitle(dto.getTitle());
-        note.setNote(dto.getNote());
-        note.setRemoteId(dto.getRemoteId() != null && !dto.getRemoteId().isEmpty()
+        Optional<NotesModel> existing = notesRepository.findByRemoteIdAndUserId(dto.getRemoteId(), userId);
+
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        NotesModel model = new NotesModel();
+        model.setNote(dto.getNote());
+        model.setTitle(dto.getTitle());
+        model.setDate(dto.getDate());
+        model.setRemoteId(dto.getRemoteId() != null && !dto.getRemoteId().isEmpty()
                 ? dto.getRemoteId()
                 : UUID.randomUUID().toString());
 
-        // Converta a String para LocalDate
-        if (dto.getDate() == null) {
-            throw new IllegalArgumentException("A data da nota não pode ser nula");
-        }
-        note.setDate(dto.getDate());
         UserModel user = new UserModel();
         user.setId(userId);
-        note.setUser(user);
+        model.setUser(user);
 
-        return notesRepository.save(note);
+        return notesRepository.save(model);
     }
 
     @Transactional
