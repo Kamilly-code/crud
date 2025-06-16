@@ -12,6 +12,6 @@ public class PublicController {
 
     @GetMapping("/public/test")
     public String publicTest() {
-        return "Rota pública de teste";
+        return "Ruta de prueba pública";
     }
 }

@@ -50,7 +50,7 @@ public class PomodoroController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(
-                            "error", "Erro ao criar pomodoro",
+                            "error", "Error al crear pomodoro",
                             "message", e.getMessage()));
         }
 
@@ -62,8 +62,17 @@ public class PomodoroController {
             @RequestBody PomodoroRequestDTO dto,
             HttpServletRequest request) {
 
-        String userId = (String) request.getAttribute(FIREBASE_USER_ID);
-        return ResponseEntity.ok(pomodoroService.updatePomodoro(remoteId, dto, userId));
+        try {
+            String userId = (String) request.getAttribute(FIREBASE_USER_ID);
+            PomodoroResponseDTO response = pomodoroService.updatePomodoro(remoteId, dto, userId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body((PomodoroResponseDTO) Map.of(
+                            "error", "Error al actualizar pomodoro",
+                            "message", e.getMessage()));
+        }
     }
 
 
@@ -71,7 +80,7 @@ public class PomodoroController {
     public ResponseEntity<String> deleteAllPomodoroSettings(HttpServletRequest request) {
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
         pomodoroService.deleteAll(userId);
-        return ResponseEntity.ok("Todas as configurações do pomodoro foram borradas com sucesso!");
+        return ResponseEntity.ok("Todas las configuraciones del pomodoro han sido borradas con éxito!");
     }
 
     @GetMapping("/ping")

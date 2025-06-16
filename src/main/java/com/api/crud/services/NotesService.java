@@ -60,7 +60,7 @@ public class NotesService {
         Optional<NotesModel> existing = notesRepository.findByRemoteIdAndUserId(remoteId, userId);
 
         if (existing.isEmpty()) {
-            log.warn("Tentativa de atualizar nota inexistente com remoteId: {}", remoteId);
+            log.warn("Intento de actualizar nota inexistente con remoteId: {}", remoteId);
             throw new NoteNotFoundException(remoteId);
         }
 
@@ -93,7 +93,7 @@ public class NotesService {
     public void deleteAllNotesByUserId(String userId) {
         List<NotesModel> userNotes = notesRepository.findByUserId(userId);
         if (userNotes.isEmpty()) {
-            throw new NoteNotFoundException("Nenhuma nota encontrada para o usuário com ID: " + userId);
+            throw new NoteNotFoundException("Ninguna nota encontrada para el usuario con ID: " + userId);
         }
         notesRepository.deleteAll(userNotes);
     }

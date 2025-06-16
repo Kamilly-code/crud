@@ -94,7 +94,11 @@ public class PomodoroService {
         model.setCurrentRound(dto.getCurrentRound());
 
         if (dto.getCurrentState() != null) {
-            model.setCurrentState(PomodoroState.valueOf(dto.getCurrentState()));
+            try {
+                model.setCurrentState(PomodoroState.valueOf(dto.getCurrentState()));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Estado inválido: " + dto.getCurrentState());
+            }
         }
 
         if (dto.getLastUpdatedDate() != null) {

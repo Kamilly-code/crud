@@ -24,7 +24,7 @@ public class FirebaseConfig  {
             String base64 = System.getenv("FIREBASE_CONFIG_BASE64");
 
             if (base64 == null || base64.isEmpty()) {
-                throw new IllegalStateException("Variável de ambiente FIREBASE_CONFIG_BASE64 não encontrada!");
+                throw new IllegalStateException("Variable de entorno FIREBASE_CONFIG_BASE64 no encontrada!");
             }
 
             byte[] decoded = Base64.getDecoder().decode(base64);
@@ -36,12 +36,12 @@ public class FirebaseConfig  {
 
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
-                log.info("✅ Firebase inicializado com sucesso (via variável de ambiente Base64).");
+                log.info("Firebase inicializado con éxito (vía variable de entorno Base64).");
             }
 
         } catch (Exception e) {
-            log.error("❌ Erro ao inicializar o Firebase", e);
-            throw new RuntimeException("Erro ao inicializar o Firebase: " + e.getMessage(), e);
+            log.error("Error al iniciar Firebase", e);
+            throw new RuntimeException("Error al iniciar Firebase: " + e.getMessage(), e);
         }
     }
 }

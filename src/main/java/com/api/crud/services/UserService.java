@@ -25,7 +25,7 @@ public class UserService {
     public UserModel getUserById(String userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
-                    log.error("Usuário não encontrado com ID: {}", userId);
+                    log.error("Usuario no encontrado con ID: {}", userId);
                     return new UserNotFoundException(userId);
                 });
     }
@@ -42,7 +42,7 @@ public class UserService {
 
     public UserModel saveUser(UserModel user) {
         if (user.getId() == null || user.getId().isEmpty()) {
-            throw new IllegalArgumentException("User ID não pode ser nulo");
+            throw new IllegalArgumentException("User ID no puede ser nulo");
         }
         return userRepository.save(user);
     }
@@ -73,7 +73,7 @@ public class UserService {
 
     public UserModel syncUser(FirebaseUserSyncRequest request, String firebaseUid) {
         if (firebaseUid == null || firebaseUid.isEmpty()) {
-            throw new IllegalArgumentException("Firebase UID não pode ser nulo");
+            throw new IllegalArgumentException("Firebase UID no puede ser nulo");
         }
 
         UserModel user = userRepository.findById(firebaseUid).orElse(new UserModel());

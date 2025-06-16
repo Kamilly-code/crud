@@ -59,7 +59,7 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter implement
             try {
                 FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
 
-                log.info("Token decodificado com sucesso. UID: {}", decodedToken.getUid());
+                log.info("Token descifrado con éxito. UID: {}", decodedToken.getUid());
 
                 request.setAttribute("firebaseUserId", decodedToken.getUid());
                 request.setAttribute("firebaseUserEmail", decodedToken.getEmail());
@@ -72,14 +72,14 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter implement
 
             } catch (FirebaseAuthException e) {
                 log.error("Token Firebase inválido: {}", e.getMessage());
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token Firebase inválido");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token de Firebase no válido");
             } catch (Exception e) {
-                log.error("Erro inesperado no filtro Firebase: {}", e.getMessage(), e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Erro interno no filtro");
+                log.error("Error inesperado en el filtro de Firebase: {}", e.getMessage(), e);
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error interno en el filtro");
             }
         } else {
-            log.warn("Authorization header ausente ou inválido: {}", authHeader);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header ausente ou inválido");
+            log.warn("Header de autorización ausente o no válido: {}", authHeader);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Header de autorización ausente o no válido");
         }
     }
 }

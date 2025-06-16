@@ -50,9 +50,9 @@ public class NotesController {
             NotesModel note = notesService.insertNote(noteDto, userId);
             return ResponseEntity.status(HttpStatus.CREATED).body(new NoteResponseDTO(note));
         } catch (Exception e) {
-            log.error("Erro ao criar nota", e);
+            log.error("Error al crear nota", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Erro ao criar nota", "message", e.getMessage()));
+                    .body(Map.of("error", "Error al crear nota", "message", e.getMessage()));
         }
     }
 
@@ -65,7 +65,7 @@ public class NotesController {
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
 
         if (log.isInfoEnabled()) {
-            log.info("Atualizando nota ID: {} com dados: {}", remoteId, noteDto);
+            log.info("Actualizando nota ID: {} con datos: {}", remoteId, noteDto);
         }
 
         NotesModel updatedNote = notesService.updateNote(remoteId, noteDto, userId);
@@ -87,7 +87,7 @@ public class NotesController {
     public ResponseEntity<String> deleteAllNotes(HttpServletRequest request) {
         String userId = (String) request.getAttribute(FIREBASE_USER_ID);
         notesService.deleteAllNotesByUserId(userId);
-        return ResponseEntity.ok("Notas deletadas com sucesso!");
+        return ResponseEntity.ok("Notas eliminadas con éxito!");
     }
     @GetMapping("/ping")
     public ResponseEntity<String> pingNotes() {
