@@ -50,6 +50,16 @@ public class PomodoroService {
         UserModel user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
+        Optional<PomodoroModel> existing = pomodoroRepository.findByRemoteIdAndUserId(requestDTO.getRemoteId(), userId);
+
+        if (existing.isPresent()) {
+            PomodoroModel existingModel = existing.get();
+            PomodoroMapper.updateModel(existingModel, requestDTO);
+            PomodoroModel updated = pomodoroRepository.save(existingModel);
+            return PomodoroMapper.toResponseDTO(updated);
+        }
+
+        // Se não existir, cria novo
         PomodoroModel model = PomodoroMapper.toModel(requestDTO);
         model.setUser(user);
 
